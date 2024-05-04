@@ -1,4 +1,4 @@
-const { AuthenticationError } = require('apollo-server-express'); // Import necessary modules
+const { AuthenticationError } = require('@apollo/server'); // Import necessary modules
 const { User } = require('../models'); // Import User model
 const { signToken } = require('../utils/auth'); // Import utility for signing tokens
 
@@ -9,7 +9,7 @@ const resolvers = {
             if (context.user) {
                 return User.findOne({ _id: context.user._id }).select('-__v -password');
             }
-            throw new AuthenticationError('You need to be logged in!');
+            throw new AuthenticationError('User not authenticated. Please log in to access your profile.');
         },
     },
 
@@ -29,13 +29,13 @@ const resolvers = {
             const user = await User.findOne({ email });
 
             if (!user) {
-                throw new AuthenticationError('User not found. Do you have an account?');
+                throw new AuthenticationError('User not found. Please check your email or sign up.');
             }
 
             // Check if the provided password matches the user's password
             const correctPw = await user.isCorrectPassword(password);
             if (!correctPw) {
-                throw new AuthenticationError('Incorrect credentials!');
+                throw new AuthenticationError('Incorrect password. Please try again.');
             }
             // Generate a token for the user
             const token = signToken(user);
@@ -53,7 +53,7 @@ const resolvers = {
                 );
                 return updatedUser;
             }
-            throw new AuthenticationError('You need to be logged in!');
+            throw new AuthenticationError('User not authenticated. Please log in to save books.');
         },
 
         // Define the resolver for removing a book
@@ -67,7 +67,7 @@ const resolvers = {
                 );
                 return updatedUser;
             }
-            throw new AuthenticationError('Login required!');
+            throw new AuthenticationError('User not authenticated. Please log in to remove books.');
         },
     },
 
