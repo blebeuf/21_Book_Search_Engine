@@ -16,6 +16,7 @@ const resolvers = {
     Mutation: {
         // Define the resolver for adding a new user
         addUser: async (parent, { username, email, password }) => {
+            console.log("signup",username,email,password)
             const user = await User.create({ username, email, password });
             // Generate a token for the new user
             const token = signToken(user);
@@ -27,7 +28,7 @@ const resolvers = {
         login: async (parent, { email, password }) => {
             // Find a user by their email address
             const user = await User.findOne({ email });
-
+            console.log("Login",user)
             if (!user) {
                 throw new AuthenticationError('User not found. Please check your email or sign up.');
             }
@@ -44,6 +45,7 @@ const resolvers = {
 
         // Define the resolver for saving a book
         saveBook: async (parent, { newBook }, context) => {
+            console.log("savebook",newBook)
             if (context.user) {
                 // If the user is authenticated, update their saved books
                 const updatedUser = await User.findByIdAndUpdate(
@@ -72,10 +74,7 @@ const resolvers = {
     },
 
     // Define a resolver for the User type
-    User: {
-        // Calculate the number of saved books for a user
-        bookCount: (parent) => parent.savedBooks.length,
-    },
+   
 };
 
 module.exports = resolvers; 
